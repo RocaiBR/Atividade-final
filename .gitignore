@@ -1,0 +1,21 @@
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Dados gerados (recriados com: python -m app.seed)
+data/
+
+# KNIME: estado de execução e metadados locais
+.metadata/
+knime/**/.savedWithData
+knime/**/port_*/
+knime/**/internal/
+knime/**/.artifacts/
+knime/**/*.lock
+
+.env
