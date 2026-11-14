@@ -4,6 +4,9 @@ import Agendar from "./paginas/Agendar.jsx";
 import Agenda from "./paginas/Agenda.jsx";
 import Clientes from "./paginas/Clientes.jsx";
 import Painel from "./paginas/Painel.jsx";
+import { Ic } from "./componentes/Icones.jsx";
+
+const AREAS = { cliente: "Área do cliente", equipe: "Área da equipe", gerente: "Área da gerente" };
 
 const PAGINAS = [
   { rota: "agendar", titulo: "Agendar", quem: "cliente", Tela: Agendar },
@@ -34,17 +37,22 @@ export default function App() {
     <>
       <header className="topo">
         <div className="topo-dentro">
-          <div className="marca">
-            Fenty Beauty<span>agenda inclusiva</span>
-          </div>
+          <a className="marca" href="#/agendar" aria-label="Fenty Beauty, agenda inclusiva">
+            fenty beauty
+          </a>
+          <span className="marca-sub" aria-hidden="true">agenda inclusiva</span>
           <nav className="abas" aria-label="Áreas do sistema">
             {PAGINAS.map((p) => (
-              <a key={p.rota} href={`#/${p.rota}`} aria-current={p.rota === pagina.rota ? "page" : undefined}>
+              <a key={p.rota} href={`#/${p.rota}`} title={AREAS[p.quem]}
+                 aria-current={p.rota === pagina.rota ? "page" : undefined}>
                 {p.titulo}
-                <small>{p.quem}</small>
               </a>
             ))}
           </nav>
+          <div className="area-atual">
+            <span className="avatar"><Ic nome={pagina.quem === "gerente" ? "alta" : pagina.quem === "equipe" ? "pessoas" : "pessoa"} tamanho={18} /></span>
+            {AREAS[pagina.quem]}
+          </div>
         </div>
       </header>
 
@@ -55,6 +63,7 @@ export default function App() {
       <footer className="rodape">
         <div className="rodape-dentro">
           <FontesDeDados saude={saude} />
+          <span className="rodape-marca">Beleza no seu ritmo.</span>
         </div>
       </footer>
     </>

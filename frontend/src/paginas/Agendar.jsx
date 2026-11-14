@@ -1,10 +1,37 @@
 import { useEffect, useState } from "react";
 import { api, CATEGORIAS, formato } from "../api.js";
-import { Cabecalho, Clima, Erro, Nivel } from "../componentes/Comuns.jsx";
+import { CampoIcone, Cabecalho, Clima, Erro, Nivel } from "../componentes/Comuns.jsx";
+import { Ic, IconeServico } from "../componentes/Icones.jsx";
 import PerfilForm, { resumirPerfil } from "../componentes/PerfilForm.jsx";
 
 const PASSOS = ["Identificação", "Preferências", "Serviço", "Dia e horário", "Confirmação"];
 const INTENSIDADE = ["", "baixo", "médio", "alto"];
+const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+/** Tela de entrada dividida: arte do salão à esquerda, cartão branco à direita. */
+function Entrada({ children }) {
+  return (
+    <div className="entrada">
+      <div className="entrada-arte" aria-hidden="true">
+        <svg className="entrada-linhas" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice">
+          <path d="M-20 90c60-40 90 20 70 70s-70 60-40 120 110 40 120 100-40 90-20 160" />
+          <path d="M-40 120c70-50 110 20 85 75s-80 70-45 125 125 45 130 110-45 95-25 150" />
+          <path d="M300 560c-30-60 20-90 60-110s60-80 20-120-30-90 40-110" />
+          <path d="M270 560c-35-70 15-105 60-128s70-90 25-135-35-100 45-125" />
+          <path d="M240 560c-40-80 10-120 60-145s80-100 30-150-40-110 50-140" />
+        </svg>
+        <span className="entrada-mais">+</span>
+        <span className="entrada-circulo" />
+        <span className="entrada-pontos" />
+        <div className="entrada-texto">
+          <p className="entrada-marca">fenty beauty</p>
+          <p className="entrada-frase">Beleza no seu ritmo. Conte do que você precisa e preparamos o salão antes de você chegar.</p>
+        </div>
+      </div>
+      <div className="entrada-cartao">{children}</div>
+    </div>
+  );
+}
 
 export default function Agendar() {
   const [passo, setPasso] = useState(0);
@@ -95,23 +122,25 @@ function Identificacao({ aoIdentificar }) {
   if (novo) return <Cadastro telefone={telefone} aoCadastrar={aoIdentificar} aoVoltar={() => setNovo(false)} />;
 
   return (
-    <form className="cartao pilha" onSubmit={buscar}>
-      <h2>Qual é o seu telefone?</h2>
-      <div className="campo" style={{ maxWidth: 320 }}>
-        <label htmlFor="telefone">
-          Telefone com DDD <span className="ajuda">Usamos só para encontrar o seu cadastro.</span>
-        </label>
-        <input id="telefone" type="tel" inputMode="tel" autoComplete="tel" required
-               placeholder="(11) 99999-0000" value={telefone}
-               onChange={(e) => setTelefone(e.target.value)} />
-      </div>
-      <Erro erro={erro} />
-      <div className="linha">
-        <button className="botao principal" disabled={buscando}>
+    <Entrada>
+      <form className="pilha" onSubmit={buscar}>
+        <div>
+          <h2 className="titulo-entrada">Entrar</h2>
+          <p className="suave">Digite seu telefone para encontrarmos o seu cadastro.</p>
+        </div>
+        <CampoIcone id="telefone" rotulo="Telefone com DDD" icone="telefone" type="tel" inputMode="tel"
+                    autoComplete="tel" required placeholder="(11) 99999-0000" value={telefone}
+                    onChange={(e) => setTelefone(e.target.value)} />
+        <Erro erro={erro} />
+        <button className="botao principal largo" disabled={buscando}>
           {buscando ? "Procurando…" : "Continuar"}
         </button>
-      </div>
-    </form>
+        <p className="pequeno suave centro">
+          Primeira vez aqui?{" "}
+          <button type="button" className="link" onClick={() => setNovo(true)}>Criar cadastro</button>
+        </p>
+      </form>
+    </Entrada>
   );
 }
 
@@ -154,56 +183,50 @@ function Cadastro({ telefone, aoCadastrar, aoVoltar }) {
   }
 
   return (
-    <form className="cartao pilha" onSubmit={enviar}>
-      <div>
-        <h2>Boas-vindas! Vamos fazer seu cadastro</h2>
-        <p className="suave">Não encontramos este telefone. Leva menos de um minuto.</p>
-      </div>
-      <div className="grade-2">
-        <div className="campo">
-          <label htmlFor="nome">Nome</label>
-          <input id="nome" type="text" required minLength={2} autoComplete="name"
-                 value={dados.nome} onChange={mudar("nome")} />
+    <Entrada>
+      <form className="pilha" onSubmit={enviar}>
+        <div>
+          <h2 className="titulo-entrada">Criar cadastro</h2>
+          <p className="suave">
+            {telefone ? "Não encontramos este telefone. " : ""}Leva menos de um minuto.
+          </p>
         </div>
-        <div className="campo">
-          <label htmlFor="tel-cadastro">Telefone com DDD</label>
-          <input id="tel-cadastro" type="tel" required value={dados.telefone} onChange={mudar("telefone")} />
+        <CampoIcone id="nome" rotulo="Nome completo" icone="pessoa" required minLength={2} autoComplete="name"
+                    value={dados.nome} onChange={mudar("nome")} />
+        <CampoIcone id="tel-cadastro" rotulo="Telefone com DDD" icone="telefone" type="tel" inputMode="tel"
+                    required value={dados.telefone} onChange={mudar("telefone")} />
+        <CampoIcone id="email" rotulo="E-mail" ajuda="(opcional)" icone="email" type="email" autoComplete="email"
+                    value={dados.email} onChange={mudar("email")} />
+        <CampoIcone id="cep" rotulo="CEP" ajuda="(opcional, preenche o endereço)" icone="local" inputMode="numeric"
+                    placeholder="00000-000" maxLength={9} value={dados.cep} onChange={aoDigitarCep}
+                    aria-describedby="aviso-cep"
+                    depois={<span id="aviso-cep" className="ajuda" role="status">{avisoCep}</span>} />
+        <CampoIcone id="logradouro" rotulo="Rua" icone="casa" value={dados.logradouro ?? ""}
+                    onChange={mudar("logradouro")} />
+        <div className="grade-3">
+          <div className="campo">
+            <label htmlFor="bairro">Bairro</label>
+            <input id="bairro" type="text" value={dados.bairro ?? ""} onChange={mudar("bairro")} />
+          </div>
+          <div className="campo">
+            <label htmlFor="cidade">Cidade</label>
+            <input id="cidade" type="text" value={dados.cidade ?? ""} onChange={mudar("cidade")} />
+          </div>
+          <div className="campo">
+            <label htmlFor="uf">Estado</label>
+            <input id="uf" type="text" maxLength={2} value={dados.uf ?? ""} onChange={mudar("uf")} />
+          </div>
         </div>
-        <div className="campo">
-          <label htmlFor="email">E-mail <span className="ajuda">(opcional)</span></label>
-          <input id="email" type="email" autoComplete="email" value={dados.email} onChange={mudar("email")} />
-        </div>
-        <div className="campo">
-          <label htmlFor="cep">CEP <span className="ajuda">(opcional, preenche o endereço)</span></label>
-          <input id="cep" type="text" inputMode="numeric" placeholder="00000-000" maxLength={9}
-                 value={dados.cep} onChange={aoDigitarCep} aria-describedby="aviso-cep" />
-          <span id="aviso-cep" className="ajuda" role="status">{avisoCep}</span>
-        </div>
-        <div className="campo">
-          <label htmlFor="logradouro">Rua</label>
-          <input id="logradouro" type="text" value={dados.logradouro ?? ""} onChange={mudar("logradouro")} />
-        </div>
-        <div className="campo">
-          <label htmlFor="bairro">Bairro</label>
-          <input id="bairro" type="text" value={dados.bairro ?? ""} onChange={mudar("bairro")} />
-        </div>
-        <div className="campo">
-          <label htmlFor="cidade">Cidade</label>
-          <input id="cidade" type="text" value={dados.cidade ?? ""} onChange={mudar("cidade")} />
-        </div>
-        <div className="campo">
-          <label htmlFor="uf">Estado</label>
-          <input id="uf" type="text" maxLength={2} value={dados.uf ?? ""} onChange={mudar("uf")} />
-        </div>
-      </div>
-      <Erro erro={erro} />
-      <div className="linha">
-        <button className="botao principal" disabled={enviando}>
+        <Erro erro={erro} />
+        <button className="botao principal largo" disabled={enviando}>
           {enviando ? "Salvando…" : "Cadastrar e continuar"}
         </button>
-        <button type="button" className="botao discreto" onClick={aoVoltar}>Usar outro telefone</button>
-      </div>
-    </form>
+        <p className="pequeno suave centro">
+          Já tem cadastro?{" "}
+          <button type="button" className="link" onClick={aoVoltar}>Entrar com outro telefone</button>
+        </p>
+      </form>
+    </Entrada>
   );
 }
 
@@ -262,8 +285,17 @@ function EscolherServico({ servico, profissionalId, aoEscolher, aoVoltar }) {
   const [servicos, setServicos] = useState([]);
   const [profissionais, setProfissionais] = useState([]);
   const [escolhido, setEscolhido] = useState(servico);
+  const [categoria, setCategoria] = useState(servico?.categoria ?? "cabelo");
   const [profissional, setProfissional] = useState(profissionalId);
   const [erro, setErro] = useState(null);
+
+  function trocarCategoria(nova) {
+    setCategoria(nova);
+    if (escolhido?.categoria !== nova) {
+      setEscolhido(null);
+      setProfissional("");
+    }
+  }
 
   useEffect(() => {
     Promise.all([api.servicos(), api.profissionais()])
@@ -279,31 +311,41 @@ function EscolherServico({ servico, profissionalId, aoEscolher, aoVoltar }) {
   return (
     <div className="pilha">
       <Erro erro={erro} />
-      {Object.entries(CATEGORIAS).map(([categoria, titulo]) => (
-        <section className="cartao pilha" key={categoria}>
-          <h2>{titulo}</h2>
-          <div className="opcoes">
-            {servicos.filter((s) => s.categoria === categoria).map((s) => (
-              <button key={s.id} type="button" className="opcao"
-                      aria-pressed={escolhido?.id === s.id}
-                      onClick={() => { setEscolhido(s); setProfissional(""); }}>
-                <strong>{s.nome}</strong>
-                <span className="suave pequeno">
-                  {formato.duracao(s.duracao_min)} · {formato.dinheiro(s.preco)}
-                </span>
-                <span className="linha" style={{ gap: 6 }}>
-                  {s.nivel_ruido >= 2 && <span className="selo">Barulho {INTENSIDADE[s.nivel_ruido]}</span>}
-                  {s.nivel_cheiro >= 2 && <span className="selo">Cheiro {INTENSIDADE[s.nivel_cheiro]}</span>}
-                  {s.contato_fisico >= 3 && <span className="selo">Toque no rosto</span>}
-                  {s.nivel_ruido < 2 && s.nivel_cheiro < 2 && s.contato_fisico < 3 && (
-                    <span className="selo">Silencioso e sem cheiro forte</span>
-                  )}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+      <section className="cartao pilha">
+        <h2>Nossos serviços</h2>
+        <div className="categorias" role="group" aria-label="Tipo de serviço">
+          {Object.entries(CATEGORIAS).map(([chave, titulo]) => (
+            <button key={chave} type="button" className="categoria" aria-pressed={categoria === chave}
+                    onClick={() => trocarCategoria(chave)}>
+              <IconeServico categoria={chave} />
+              <span>{titulo}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="cartao pilha">
+        <h2>{CATEGORIAS[categoria]}</h2>
+        <div className="opcoes">
+          {servicos.filter((s) => s.categoria === categoria).map((s) => (
+            <button key={s.id} type="button" className="opcao"
+                    aria-pressed={escolhido?.id === s.id}
+                    onClick={() => { setEscolhido(s); setProfissional(""); }}>
+              <strong>{s.nome}</strong>
+              <span className="suave pequeno">
+                {formato.duracao(s.duracao_min)} · {formato.dinheiro(s.preco)}
+              </span>
+              <span className="linha" style={{ gap: 6 }}>
+                {s.nivel_ruido >= 2 && <span className="selo">Barulho {INTENSIDADE[s.nivel_ruido]}</span>}
+                {s.nivel_cheiro >= 2 && <span className="selo">Cheiro {INTENSIDADE[s.nivel_cheiro]}</span>}
+                {s.contato_fisico >= 3 && <span className="selo">Toque no rosto</span>}
+                {s.nivel_ruido < 2 && s.nivel_cheiro < 2 && s.contato_fisico < 3 && (
+                  <span className="selo">Silencioso e sem cheiro forte</span>
+                )}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {escolhido && (
         <section className="cartao pilha">
@@ -394,10 +436,14 @@ function EscolherHorario({ cliente, servico, profissionalId, aoConfirmar, aoVolt
         </div>
         <div className="dias">
           {resumo.dias.map((d) => (
-            <button key={d.data} type="button" className="opcao"
+            <button key={d.data} type="button" className="opcao dia"
                     disabled={!d.aberto || d.horarios_livres === 0}
                     aria-pressed={dia?.data === d.data} onClick={() => escolherDia(d)}>
-              <strong>{d.dia_semana}, {formato.dataCurta(d.data)}</strong>
+              <span className="dia-data">
+                <span className="dia-semana">{d.dia_semana}</span>
+                <span className="dia-numero numeros">{Number(d.data.slice(8, 10))}</span>
+                <span className="dia-mes">{MESES[Number(d.data.slice(5, 7)) - 1]}</span>
+              </span>
               <Clima clima={d.clima} />
               {d.aberto && d.horarios_livres > 0 && (
                 <span><Nivel nivel={d.melhor_nivel} /></span>
@@ -489,18 +535,18 @@ function Confirmacao({ cliente, servico, agendamento, aoRecomecar }) {
 
   return (
     <div className="pilha">
-      <section className="cartao pilha">
-        <h2>Agendamento confirmado, {cliente.nome.split(" ")[0]}</h2>
-        <dl className="resumo">
-          <dt>Quando</dt>
-          <dd>{formato.dataLonga(agendamento.inicio)}, das {agendamento.hora} às {formato.hora(agendamento.fim)}</dd>
-          <dt>Serviço</dt>
-          <dd>{servico.nome}</dd>
-          <dt>Com</dt>
-          <dd>{agendamento.profissional_nome}</dd>
-          <dt>Ambiente</dt>
-          <dd><Nivel nivel={agendamento.nivel} indice={agendamento.indice} /></dd>
+      <section className="cartao pilha confirmado">
+        <h2>Até breve, {cliente.nome.split(" ")[0]}!</h2>
+        <dl className="resumo-grade">
+          <div><dt>Serviço</dt><dd>{servico.nome}</dd></div>
+          <div><dt>Profissional</dt><dd>{agendamento.profissional_nome}</dd></div>
+          <div><dt>Data</dt><dd>{formato.dataLonga(agendamento.inicio)}</dd></div>
+          <div><dt>Horário</dt><dd className="numeros">{agendamento.hora} às {formato.hora(agendamento.fim)}</dd></div>
+          <div><dt>Ambiente</dt><dd><Nivel nivel={agendamento.nivel} indice={agendamento.indice} /></dd></div>
         </dl>
+        <p className="selo-confirmado" role="status">
+          <Ic nome="ok" tamanho={20} /> Agendamento confirmado
+        </p>
         {cliente.perfil && (
           <p className="aviso">A equipe já recebeu suas preferências e vai se preparar antes de você chegar.</p>
         )}

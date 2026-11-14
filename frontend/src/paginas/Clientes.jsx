@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, formato } from "../api.js";
-import { Cabecalho, Erro, Nivel } from "../componentes/Comuns.jsx";
+import { CampoIcone, Cabecalho, Erro, Nivel } from "../componentes/Comuns.jsx";
 import PerfilForm, { resumirPerfil } from "../componentes/PerfilForm.jsx";
 
 const STATUS = { agendado: "Agendado", concluido: "Concluído", cancelado: "Cancelado", faltou: "Faltou" };
@@ -26,9 +26,9 @@ export default function Clientes() {
       <Cabecalho titulo="Clientes">
         Cadastro (SQLite) junto com as preferências de atendimento (MongoDB).
       </Cabecalho>
-      <div className="campo" style={{ maxWidth: 360, marginBottom: 16 }}>
-        <label htmlFor="busca">Buscar por nome ou telefone</label>
-        <input id="busca" type="text" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <div style={{ maxWidth: 380, marginBottom: 16 }}>
+        <CampoIcone id="busca" rotulo="Buscar por nome ou telefone" icone="busca" type="search"
+                    value={busca} onChange={(e) => setBusca(e.target.value)} />
       </div>
       <Erro erro={erro} />
       <div className="cartao rolagem">

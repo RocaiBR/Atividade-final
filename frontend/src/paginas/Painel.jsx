@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, CATEGORIAS, formato } from "../api.js";
 import { Cabecalho, Erro } from "../componentes/Comuns.jsx";
 import { Barras, ColunasEmpilhadas, Legenda, MapaDeCalor, TabelaDados } from "../componentes/Graficos.jsx";
+import { Ic } from "../componentes/Icones.jsx";
 
 const DIAS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 const NIVEIS = ["Calmo", "Moderado", "Movimentado"];
@@ -127,12 +128,12 @@ function Conteudo({ painel }) {
         Os clientes e atendimentos são fictícios (dados de demonstração); o clima é real.
       </p>
       <div className="indicadores">
-        <Indicador rotulo="Atendimentos concluídos" valor={resumo.atendimentos.toLocaleString("pt-BR")} />
-        <Indicador rotulo="Receita" valor={formato.dinheiro(resumo.receita)} />
-        <Indicador rotulo="Faltas" valor={formato.porcento(resumo.taxa_faltas)} nota="dos horários marcados" />
-        <Indicador rotulo="Primeiras visitas" valor={formato.porcento(resumo.pct_primeira_visita)} nota="dos atendimentos" />
-        <Indicador rotulo="Conforto médio" valor={resumo.conforto_medio ? formato.nota(resumo.conforto_medio) : "—"} nota="de 1 a 5" />
-        <Indicador rotulo="Clientes com preferências" valor={`${resumo.clientes_com_perfil} de ${resumo.clientes}`} nota="atendidos no período" />
+        <Indicador icone="calendario" rotulo="Atendimentos concluídos" valor={resumo.atendimentos.toLocaleString("pt-BR")} />
+        <Indicador icone="alta" rotulo="Receita" valor={formato.dinheiro(resumo.receita)} />
+        <Indicador icone="pessoaX" rotulo="Faltas" valor={formato.porcento(resumo.taxa_faltas)} nota="dos horários marcados" />
+        <Indicador icone="pessoaMais" rotulo="Primeiras visitas" valor={formato.porcento(resumo.pct_primeira_visita)} nota="dos atendimentos" />
+        <Indicador icone="coracao" rotulo="Conforto médio" valor={resumo.conforto_medio ? formato.nota(resumo.conforto_medio) : "—"} nota="de 1 a 5" />
+        <Indicador icone="pessoas" rotulo="Clientes com preferências" valor={`${resumo.clientes_com_perfil} de ${resumo.clientes}`} nota="atendidos no período" />
       </div>
       <div className="graficos">
         <Conforto dados={painel.conforto} />
@@ -145,12 +146,15 @@ function Conteudo({ painel }) {
   );
 }
 
-function Indicador({ rotulo, valor, nota }) {
+function Indicador({ icone, rotulo, valor, nota }) {
   return (
     <div className="indicador">
-      <div className="rotulo">{rotulo}</div>
-      <div className="valor">{valor}</div>
-      {nota && <div className="nota">{nota}</div>}
+      {icone && <span className="indicador-icone"><Ic nome={icone} tamanho={26} traco={1.5} /></span>}
+      <div>
+        <div className="rotulo">{rotulo}</div>
+        <div className="valor">{valor}</div>
+        {nota && <div className="nota">{nota}</div>}
+      </div>
     </div>
   );
 }
