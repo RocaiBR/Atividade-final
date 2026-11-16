@@ -6,9 +6,9 @@ Sistema de agendamento para o salão de beleza Fenty Beauty (gerente, cabeleirei
 
 | Integrante | Responsabilidade |
 |---|---|
-| _(nome)_ | _(ex.: backend e APIs)_ |
-| _(nome)_ | _(ex.: frontend)_ |
-| _(nome)_ | _(ex.: KNIME e painel)_ |
+| _(Ícaro)_ | _(backend e APIs)_ |
+| _(Vitória e Isadora)_ | _( frontend)_ |
+| _(Vitor e Kevin)_ | _( KNIME e painel)_ |
 
 ## O problema
 
